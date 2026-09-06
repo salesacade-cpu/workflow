@@ -1281,7 +1281,7 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeM
    ========================================================== */
 var form = $('#consultForm'), result = $('#formResult');
 var MAIL = 'partner@workflow.ai.kr';
-var SHEET_ENDPOINT = '';   /* 예: https://script.google.com/macros/s/AKfycb.../exec */
+var SHEET_ENDPOINT = 'https://script.google.com/macros/s/AKfycbx06g-zoB-E1EuXx2-zwNRfE-V3p7apuqbcTJ_WoUdelvB1VXx1jgQZF_PZuzlRKbsCrg/exec';
 
 function fieldLines(){
   var g = function(n){ var el = form.elements[n]; return el ? String(el.value || '').trim() : ''; };
