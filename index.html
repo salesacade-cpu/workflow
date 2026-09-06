@@ -1,0 +1,592 @@
+<title>SOL Workflow &amp; HRD AI</title>
+<meta name="description" content="SOL — AI 워크플로우 자동화와 HRD를 함께 설계하는 서비스 소개 및 상담 신청 페이지" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" />
+
+<style>
+  :root {
+    --bg: #0B0B0D;
+    --bg-2: #131317;
+    --bg-3: #1A1A1F;
+    --ink: #F2F2F4;
+    --muted: #9A9AA2;
+    --faint: #6A6A72;
+    --line: #2A2A31;
+    --line-2: #3A3A43;
+
+    --gold: #D8AE72;
+    --gold-lo: #B8843E;
+    --gold-grad: linear-gradient(135deg, #F1D8AC 0%, #D4A968 46%, #B8843E 100%);
+    --silver-grad: linear-gradient(150deg, #FFFFFF 0%, #C7CBD1 30%, #7E828A 56%, #ECEDEF 80%, #A9ADB4 100%);
+
+    --font: "Pretendard Variable", "Pretendard", "Apple SD Gothic Neo",
+            "Noto Sans KR", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    font-family: var(--font);
+    font-size: 16px;
+    line-height: 1.7;
+    color: var(--ink);
+    background:
+      radial-gradient(130% 90% at 50% -10%, #191920 0%, #0B0B0D 58%) fixed,
+      var(--bg);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+
+  a { color: inherit; }
+  :focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; border-radius: 3px; }
+
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 clamp(1.2rem, 4vw, 2.2rem); }
+  .section { padding: clamp(3.4rem, 8vw, 6rem) 0; position: relative; }
+  .rule-top { border-top: 1px solid var(--line); }
+
+  /* ---------- metallic / accent text ---------- */
+  .metal {
+    background: var(--silver-grad);
+    -webkit-background-clip: text; background-clip: text;
+    color: #C7CBD1; -webkit-text-fill-color: transparent;
+  }
+  .gold {
+    background: var(--gold-grad);
+    -webkit-background-clip: text; background-clip: text;
+    color: var(--gold); -webkit-text-fill-color: transparent;
+  }
+
+  /* ---------- header ---------- */
+  .site-header {
+    position: sticky; top: 0; z-index: 30;
+    background: rgba(11, 11, 13, 0.82);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+  .site-header .wrap { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .85rem 0; }
+  .brand { display: flex; align-items: baseline; gap: .5rem; text-decoration: none; white-space: nowrap; }
+  .brand-sol { font-weight: 800; font-size: 1.18rem; letter-spacing: .03em; }
+  .brand-sep { color: var(--faint); }
+  .brand-rest { color: var(--muted); font-weight: 600; font-size: .92rem; letter-spacing: .01em; }
+  .nav { display: flex; gap: 1.7rem; }
+  .nav a { font-size: .9rem; color: var(--muted); text-decoration: none; transition: color .15s ease; }
+  .nav a:hover { color: var(--ink); }
+  @media (max-width: 780px) { .nav { display: none; } .brand-rest { display: none; } }
+
+  /* ---------- buttons ---------- */
+  .btn {
+    display: inline-flex; align-items: center; gap: .5rem;
+    font-family: var(--font); font-weight: 700; font-size: .96rem;
+    border-radius: 10px; padding: .8em 1.5em; cursor: pointer;
+    text-decoration: none; border: 1px solid transparent;
+    transition: transform .15s ease, filter .15s ease, border-color .15s ease, color .15s ease, background .15s ease;
+  }
+  .btn-primary { background: var(--gold-grad); color: #1B1305; }
+  .btn-primary:hover { transform: translateY(-1px); filter: brightness(1.06); }
+  .btn-ghost { background: transparent; border-color: var(--line-2); color: var(--ink); }
+  .btn-ghost:hover { border-color: var(--gold); color: var(--gold); }
+  .btn-sm { padding: .58em 1.1em; font-size: .87rem; }
+
+  /* ---------- eyebrow / section head ---------- */
+  .eyebrow {
+    font-size: .72rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase;
+    color: var(--gold); margin: 0 0 1rem; padding-left: 2.2rem; position: relative;
+  }
+  .eyebrow::before { content: ""; position: absolute; left: 0; top: .55em; width: 1.5rem; height: 1px; background: var(--gold); }
+  .s-title {
+    font-size: clamp(1.55rem, 1.2rem + 1.6vw, 2.15rem); font-weight: 700;
+    letter-spacing: -.015em; line-height: 1.22; text-wrap: balance;
+    margin: 0 0 1rem; max-width: 24ch;
+  }
+  .s-intro { color: var(--muted); max-width: 60ch; margin: 0 0 2.6rem; }
+
+  /* ---------- decorative circuit ---------- */
+  .circuit-wrap { position: absolute; pointer-events: none; opacity: .11; width: min(42vw, 420px); }
+  .circuit-wrap.hero-c { top: -10px; right: -30px; }
+  .circuit-wrap.contact-c { bottom: -20px; left: -40px; transform: scaleX(-1); }
+  .circuit-wrap svg { width: 100%; height: auto; display: block; }
+  @media (max-width: 720px) { .circuit-wrap.hero-c { opacity: .07; } }
+
+  /* ---------- hero ---------- */
+  .hero-inner { display: grid; grid-template-columns: 1.06fr .94fr; gap: clamp(2rem, 5vw, 4rem); align-items: center; }
+  @media (max-width: 920px) { .hero-inner { grid-template-columns: 1fr; } }
+  .hero h1 {
+    font-size: clamp(2.05rem, 1.4rem + 3.3vw, 3.35rem); font-weight: 800;
+    letter-spacing: -.022em; line-height: 1.14; text-wrap: balance;
+    margin: 0 0 1.15rem;
+  }
+  .hero-sub { font-size: 1.08rem; color: var(--muted); max-width: 45ch; margin: 0 0 1.9rem; }
+  .hero-cta { display: flex; gap: .9rem; flex-wrap: wrap; margin-bottom: 1.6rem; }
+  .hero-trust { font-size: .82rem; color: var(--faint); letter-spacing: .02em; }
+
+  .rings-stage { position: relative; display: flex; justify-content: center; }
+  .rings-glow {
+    position: absolute; inset: 12% 14%; border-radius: 50%;
+    background: radial-gradient(circle, rgba(216,174,114,.16), rgba(216,174,114,0) 68%);
+    filter: blur(6px); animation: breathe 9s ease-in-out infinite;
+  }
+  @keyframes breathe { 0%,100% { opacity: .55; transform: scale(.96); } 50% { opacity: 1; transform: scale(1.04); } }
+  .rings { width: 100%; max-width: 400px; height: auto; display: block; position: relative; }
+  .ring-label { fill: #14140F; font-weight: 800; font-size: 21px; text-anchor: middle; font-family: var(--font); }
+  .ring-nodes circle { fill: #9A9AA2; }
+  .ring-nodes line { stroke: #9A9AA2; stroke-width: 1.4; }
+
+  /* ---------- pain ---------- */
+  .pain { background: var(--bg-2); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .pain-grid { display: grid; grid-template-columns: repeat(3, 1fr); }
+  @media (max-width: 800px) { .pain-grid { grid-template-columns: 1fr; } }
+  .pain-item { padding: 1.7rem 1.7rem 1.7rem 0; display: flex; gap: 1rem; align-items: flex-start; }
+  .pain-item + .pain-item { border-left: 1px solid var(--line); padding-left: 1.7rem; }
+  @media (max-width: 800px) {
+    .pain-item + .pain-item { border-left: 0; border-top: 1px solid var(--line); padding-left: 0; }
+  }
+  .pain-mark { font-size: .8rem; font-weight: 700; letter-spacing: .06em; color: var(--gold); flex: none; padding-top: .3rem; }
+  .pain-item p { margin: 0; font-size: .98rem; line-height: 1.6; color: var(--ink); }
+
+  /* ---------- capabilities ---------- */
+  .cap-grid { display: grid; grid-template-columns: repeat(2, 1fr); column-gap: 2.8rem; border-top: 1px solid var(--line); }
+  @media (max-width: 660px) { .cap-grid { grid-template-columns: 1fr; } }
+  .cap { padding: 1.7rem 0 1.6rem; border-bottom: 1px solid var(--line); }
+  .cap-label { font-size: .68rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--faint); margin: 0 0 .6rem; }
+  .cap-label.hrd { color: var(--gold); }
+  .cap-name { font-size: 1.06rem; font-weight: 700; margin: 0 0 .4rem; letter-spacing: -.01em; }
+  .cap-desc { color: var(--muted); font-size: .95rem; line-height: 1.62; margin: 0; }
+
+  /* ---------- steps ---------- */
+  .steps { list-style: none; padding: 0; margin: 0; }
+  .step { display: grid; grid-template-columns: auto 1fr; gap: 1.6rem; padding: 1.8rem 0; border-top: 1px solid var(--line); }
+  .step:last-child { border-bottom: 1px solid var(--line); }
+  .step-n { font-size: 1rem; font-weight: 800; color: var(--gold); letter-spacing: .04em; padding-top: .25rem; font-variant-numeric: tabular-nums; }
+  .step-b h3 { font-size: 1.16rem; font-weight: 700; margin: 0 0 .45rem; letter-spacing: -.01em; }
+  .step-b p { margin: 0; color: var(--muted); max-width: 56ch; line-height: 1.62; }
+  .step-b .dur {
+    display: inline-block; margin-top: .6rem; font-size: .72rem; font-weight: 600;
+    letter-spacing: .06em; color: var(--faint); border: 1px solid var(--line-2);
+    border-radius: 999px; padding: .22em .8em;
+  }
+
+  /* ---------- stats ---------- */
+  .tag {
+    display: inline-block; font-size: .68rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--faint); border: 1px solid var(--line-2); border-radius: 999px; padding: .32em .9em; margin-bottom: 1rem;
+  }
+  .stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.4rem; }
+  @media (max-width: 700px) { .stat-row { grid-template-columns: 1fr; } }
+  .stat { border: 1px solid var(--line); border-radius: 14px; padding: 1.6rem; background: var(--bg-2); }
+  .stat-fig {
+    display: block; font-size: clamp(1.9rem, 1.4rem + 1.8vw, 2.7rem); font-weight: 800;
+    letter-spacing: -.02em; line-height: 1; font-variant-numeric: tabular-nums; color: var(--ink);
+  }
+  .stat-cap { display: block; margin-top: .7rem; color: var(--muted); font-size: .9rem; }
+  .stat-note { margin: 1.3rem 0 0; font-size: .84rem; line-height: 1.55; color: var(--faint); max-width: 62ch; }
+
+  /* ---------- faq ---------- */
+  .faq { margin: 0; }
+  .qa { border-top: 1px solid var(--line); padding: 1.5rem 0; }
+  .qa:last-child { border-bottom: 1px solid var(--line); }
+  .qa dt { font-size: 1.02rem; font-weight: 700; margin-bottom: .5rem; letter-spacing: -.01em; }
+  .qa dd { margin: 0; color: var(--muted); line-height: 1.65; max-width: 64ch; }
+
+  /* ---------- contact ---------- */
+  .contact { background: var(--bg-2); border-top: 1px solid var(--line); overflow: hidden; }
+  .wordmark {
+    font-size: clamp(1.7rem, 1.2rem + 2.4vw, 2.6rem); font-weight: 800;
+    letter-spacing: -.01em; margin: 0 0 1.4rem; line-height: 1;
+  }
+  .wordmark .dim { color: var(--faint); }
+  .contact-inner { display: grid; grid-template-columns: .9fr 1.1fr; gap: clamp(2rem, 5vw, 3.6rem); align-items: start; position: relative; z-index: 1; }
+  @media (max-width: 880px) { .contact-inner { grid-template-columns: 1fr; } }
+  .contact-copy p { color: var(--muted); max-width: 42ch; }
+  .card-contact { list-style: none; margin: 1.6rem 0 0; padding: 0; display: grid; gap: .55rem; }
+  .card-contact li { font-size: .92rem; color: var(--ink); display: flex; gap: .75rem; }
+  .card-contact .cc-k { color: var(--faint); font-size: .74rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; min-width: 2.6rem; padding-top: .18rem; }
+  .card-contact a { color: var(--ink); text-decoration: none; border-bottom: 1px solid var(--line-2); }
+  .card-contact a:hover { color: var(--gold); border-color: var(--gold); }
+
+  .form-panel { background: var(--bg-3); border: 1px solid var(--line-2); border-radius: 16px; padding: clamp(1.5rem, 4vw, 2.4rem); }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.1rem 1.2rem; }
+  @media (max-width: 560px) { .form-grid { grid-template-columns: 1fr; } }
+  .field { display: flex; flex-direction: column; }
+  .field.full { grid-column: 1 / -1; }
+  .field label { font-size: .68rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--faint); margin-bottom: .45rem; }
+  .field label .req { color: var(--gold); }
+  .field input, .field textarea {
+    font-family: var(--font); font-size: .97rem; color: var(--ink);
+    background: var(--bg); border: 1px solid var(--line-2); border-radius: 9px;
+    padding: .72em .85em; width: 100%; transition: border-color .15s ease;
+  }
+  .field input::placeholder, .field textarea::placeholder { color: #5C5C64; }
+  .field input:focus, .field textarea:focus { outline: none; border-color: var(--gold); }
+  .field textarea { resize: vertical; min-height: 108px; }
+  .form-actions { margin-top: 1.4rem; display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+  .form-note { font-size: .82rem; color: var(--faint); margin: .9rem 0 0; }
+  .form-done { background: var(--bg-3); border: 1px solid var(--gold); border-radius: 16px; padding: clamp(1.5rem, 4vw, 2.4rem); }
+  .form-done h3 { font-size: 1.2rem; font-weight: 700; margin: 0 0 .6rem; }
+  .form-done p { margin: 0; color: var(--muted); line-height: 1.6; }
+
+  /* ---------- footer ---------- */
+  .site-footer { border-top: 1px solid var(--line); padding: 2.4rem 0; color: var(--faint); font-size: .84rem; }
+  .site-footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; gap: .8rem 1.5rem; align-items: baseline; }
+  .site-footer .fb-brand { color: var(--muted); font-weight: 600; }
+  .site-footer .fb-en { letter-spacing: .02em; }
+</style>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="SOL Workflow & HRD AI 홈">
+      <span class="brand-sol metal">SOL</span>
+      <span class="brand-sep">—</span>
+      <span class="brand-rest">Workflow &amp; HRD AI</span>
+    </a>
+    <nav class="nav" aria-label="주요 섹션">
+      <a href="#features">서비스</a>
+      <a href="#how">진행 방식</a>
+      <a href="#impact">도입 효과</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <a class="btn btn-primary btn-sm" href="#contact">상담 신청</a>
+  </div>
+</header>
+
+<main id="top">
+  <!-- HERO -->
+  <section class="section">
+    <div class="circuit-wrap hero-c" aria-hidden="true">
+      <svg viewBox="0 0 420 240">
+        <g fill="none" stroke="#C9CDD3" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M8 70 H128 Q150 70 150 92 V168" />
+          <path d="M150 120 H262 Q284 120 284 98 V34 H392" />
+          <path d="M284 158 H352 Q374 158 374 180 V226" />
+          <path d="M70 70 V26" />
+          <path d="M150 168 H240" />
+        </g>
+        <g fill="#C9CDD3">
+          <circle cx="8" cy="70" r="4" /><circle cx="240" cy="168" r="4" />
+          <circle cx="392" cy="34" r="5" /><circle cx="374" cy="226" r="4" />
+          <circle cx="70" cy="26" r="4" />
+        </g>
+        <rect x="276" y="90" width="16" height="16" fill="#C9CDD3" transform="rotate(45 284 98)" />
+      </svg>
+    </div>
+
+    <div class="wrap hero hero-inner">
+      <div>
+        <p class="eyebrow">SOL · Workflow &amp; HRD AI</p>
+        <h1>AI <span class="gold">워크플로우</span>로 완성되는<br />조직의 경쟁력</h1>
+        <p class="hero-sub">
+          SOL은 반복 업무를 줄이는 <strong>워크플로우 자동화</strong>와, 그 변화를 현업에 정착시키는
+          <strong>HRD</strong>를 함께 설계합니다. 기술과 사람이 맞물릴 때 조직의 실행력이 올라갑니다.
+        </p>
+        <div class="hero-cta">
+          <a class="btn btn-primary" href="#contact">상담 신청하기</a>
+          <a class="btn btn-ghost" href="#how">진행 방식 보기</a>
+        </div>
+        <p class="hero-trust">업무 자동화 · 교육과정 운영 · 세미나 진행 · 역량 진단 리포트</p>
+      </div>
+
+      <div class="rings-stage">
+        <div class="rings-glow" aria-hidden="true"></div>
+        <svg class="rings" viewBox="0 0 340 270" role="img" aria-label="기술과 사람이 맞물린 SOL의 상징">
+          <defs>
+            <linearGradient id="metalRing" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#FFFFFF" />
+              <stop offset="0.32" stop-color="#C9CDD3" />
+              <stop offset="0.58" stop-color="#74777E" />
+              <stop offset="0.8" stop-color="#ECEDEF" />
+              <stop offset="1" stop-color="#A6AAB1" />
+            </linearGradient>
+            <linearGradient id="metalThin" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#EFF0F2" />
+              <stop offset="1" stop-color="#63666D" />
+            </linearGradient>
+          </defs>
+
+          <g>
+            <circle cx="128" cy="135" r="70" fill="none" stroke="url(#metalRing)" stroke-width="27" />
+            <circle cx="128" cy="135" r="84" fill="none" stroke="url(#metalThin)" stroke-width="1.4" opacity=".55" />
+            <circle cx="128" cy="135" r="56" fill="none" stroke="url(#metalThin)" stroke-width="1.4" opacity=".55" />
+          </g>
+          <g>
+            <circle cx="212" cy="135" r="70" fill="none" stroke="url(#metalRing)" stroke-width="27" />
+            <circle cx="212" cy="135" r="84" fill="none" stroke="url(#metalThin)" stroke-width="1.4" opacity=".55" />
+            <circle cx="212" cy="135" r="56" fill="none" stroke="url(#metalThin)" stroke-width="1.4" opacity=".55" />
+            <path d="M170 76 A70 70 0 0 1 212 65" fill="none" stroke="url(#metalRing)" stroke-width="27" stroke-linecap="round" />
+          </g>
+
+          <text class="ring-label" x="128" y="72">기술</text>
+          <text class="ring-label" x="212" y="205">사람</text>
+
+          <g class="ring-nodes">
+            <line x1="52" y1="98" x2="74" y2="112" /><circle cx="48" cy="96" r="5" />
+            <line x1="66" y1="188" x2="86" y2="172" /><circle cx="62" cy="190" r="4" />
+            <line x1="286" y1="74" x2="266" y2="92" /><circle cx="290" cy="70" r="4" />
+            <line x1="300" y1="176" x2="278" y2="160" /><circle cx="304" cy="178" r="5" />
+            <line x1="170" y1="238" x2="170" y2="214" /><circle cx="170" cy="242" r="4" />
+          </g>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAIN -->
+  <section class="pain">
+    <div class="wrap">
+      <div class="pain-grid">
+        <div class="pain-item"><span class="pain-mark">01</span><p>반복 문서 작업에 팀의 시간이 계속 새어 나간다</p></div>
+        <div class="pain-item"><span class="pain-mark">02</span><p>교육을 해도 현업 적용까지 이어지지 않는다</p></div>
+        <div class="pain-item"><span class="pain-mark">03</span><p>무엇을 자동화하고 무엇을 사람이 할지 기준이 없다</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="section" id="features">
+    <div class="wrap">
+      <p class="eyebrow">서비스</p>
+      <h2 class="s-title">기술과 사람, 두 축을 함께 설계합니다</h2>
+      <p class="s-intro">
+        SOL은 반복 업무를 줄이는 워크플로우 자동화와, 그 변화를 현업에 정착시키는 HRD를
+        하나의 프로젝트로 진행합니다.
+      </p>
+      <div class="cap-grid">
+        <div class="cap">
+          <p class="cap-label">Workflow</p>
+          <p class="cap-name">요청 접수 · 분류 자동화</p>
+          <p class="cap-desc">메일·폼·메신저로 들어온 요청을 한곳에 모아 내용에 따라 분류하고 접수합니다.</p>
+        </div>
+        <div class="cap">
+          <p class="cap-label">Workflow</p>
+          <p class="cap-name">문서 · 데이터 처리</p>
+          <p class="cap-desc">송장·계약서·신청서에서 필요한 값을 추출해 사내 시스템 형식으로 입력합니다.</p>
+        </div>
+        <div class="cap">
+          <p class="cap-label">Workflow</p>
+          <p class="cap-name">담당자 라우팅 · 알림</p>
+          <p class="cap-desc">규칙과 맥락을 함께 보고 적합한 담당자와 다음 단계로 넘기고 관련자에게 알립니다.</p>
+        </div>
+        <div class="cap">
+          <p class="cap-label hrd">HRD</p>
+          <p class="cap-name">교육과정 설계 · 운영</p>
+          <p class="cap-desc">조직에 필요한 역량을 기준으로 과정을 설계하고, 안내·자료·과제 운영을 자동화합니다.</p>
+        </div>
+        <div class="cap">
+          <p class="cap-label hrd">HRD</p>
+          <p class="cap-name">세미나 · 워크숍 진행</p>
+          <p class="cap-desc">일정 안내부터 자료 배포, 사후 피드백 수집까지 한 흐름으로 처리합니다.</p>
+        </div>
+        <div class="cap">
+          <p class="cap-label hrd">HRD</p>
+          <p class="cap-name">역량 진단 · 리포트</p>
+          <p class="cap-desc">진단 결과를 정해진 형식의 리포트로 정리해 담당자와 구성원에게 전달합니다.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW -->
+  <section class="section" id="how" style="background:var(--bg-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
+    <div class="wrap">
+      <p class="eyebrow">진행 방식</p>
+      <h2 class="s-title">3단계로 도입합니다</h2>
+      <p class="s-intro">효과가 큰 지점을 먼저 찾고, 쓰던 도구에 맞춰 흐름을 연결한 뒤, 실제 업무와 교육에서 다듬어 갑니다.</p>
+      <ol class="steps">
+        <li class="step">
+          <span class="step-n">01</span>
+          <div class="step-b">
+            <h3>진단</h3>
+            <p>업무 흐름과 팀 역량을 함께 살펴보고, 자동화할 지점과 교육이 필요한 지점을 나눕니다. 효과가 낮다고 보이면 도입을 권하지 않습니다.</p>
+            <span class="dur">약 1주</span>
+          </div>
+        </li>
+        <li class="step">
+          <span class="step-n">02</span>
+          <div class="step-b">
+            <h3>설계 · 연동</h3>
+            <p>메일·스프레드시트·CRM·메신저 등 지금 쓰는 도구에 맞춰 워크플로우를 연결하고, 필요한 교육과정과 세미나를 설계합니다.</p>
+            <span class="dur">약 2–3주</span>
+          </div>
+        </li>
+        <li class="step">
+          <span class="step-n">03</span>
+          <div class="step-b">
+            <h3>운영 · 정착</h3>
+            <p>실제 업무에 적용하며 예외 케이스를 보완하고, 교육 내용이 현업에 자리잡도록 이어갑니다.</p>
+            <span class="dur">지속</span>
+          </div>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- IMPACT -->
+  <section class="section" id="impact">
+    <div class="wrap">
+      <span class="tag">예시 시나리오</span>
+      <h2 class="s-title">문서 업무 자동화 + 교육 정착을 함께 하면</h2>
+      <div class="stat-row">
+        <div class="stat"><span class="stat-fig">−70%</span><span class="stat-cap">문서 1건당 처리 시간</span></div>
+        <div class="stat"><span class="stat-fig">월 280시간</span><span class="stat-cap">반복 작업에서 회수한 시간</span></div>
+        <div class="stat"><span class="stat-fig">−60%</span><span class="stat-cap">교육 운영 준비 공수</span></div>
+      </div>
+      <p class="stat-note">
+        위 수치는 가상의 도입 시나리오 예시이며, 특정 고객사의 실제 성과가 아닙니다.
+        실제 효과는 업무 특성과 처리량, 조직 상황에 따라 달라집니다.
+      </p>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="section" id="faq" style="background:var(--bg-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
+    <div class="wrap">
+      <p class="eyebrow">자주 묻는 질문</p>
+      <h2 class="s-title">도입 전에 자주 확인하시는 것들</h2>
+      <dl class="faq">
+        <div class="qa">
+          <dt>우리 데이터는 안전한가요?</dt>
+          <dd>요청하신 범위의 데이터만 처리하며, 저장 위치와 접근 권한은 도입 전에 함께 정합니다. 모델 학습 목적의 2차 사용은 하지 않습니다.</dd>
+        </div>
+        <div class="qa">
+          <dt>쓰던 툴을 바꿔야 하나요?</dt>
+          <dd>아니요. 메일·스프레드시트·자주 쓰는 CRM·메신저는 그대로 두고 그 사이를 잇는 방식입니다.</dd>
+        </div>
+        <div class="qa">
+          <dt>워크플로우만, 또는 HRD만 도입할 수 있나요?</dt>
+          <dd>네, 둘 중 하나만도 가능합니다. 다만 자동화와 교육을 함께 설계하면 변화가 현업에 정착되는 효과가 더 큽니다.</dd>
+        </div>
+        <div class="qa">
+          <dt>도입까지 얼마나 걸리나요?</dt>
+          <dd>업무 1–2개 기준으로 진단부터 운영까지 보통 3–4주입니다. 범위가 넓으면 단계를 나눠 진행합니다.</dd>
+        </div>
+        <div class="qa">
+          <dt>비용은 어떻게 책정되나요?</dt>
+          <dd>자동화할 업무 수와 월 처리량, 교육 범위에 따라 책정합니다. 상담 시 예상 범위를 먼저 알려드립니다.</dd>
+        </div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="section contact" id="contact">
+    <div class="circuit-wrap contact-c" aria-hidden="true">
+      <svg viewBox="0 0 420 240">
+        <g fill="none" stroke="#C9CDD3" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M8 70 H128 Q150 70 150 92 V168" />
+          <path d="M150 120 H262 Q284 120 284 98 V34 H392" />
+          <path d="M284 158 H352 Q374 158 374 180 V226" />
+          <path d="M70 70 V26" />
+        </g>
+        <g fill="#C9CDD3">
+          <circle cx="8" cy="70" r="4" /><circle cx="392" cy="34" r="5" />
+          <circle cx="374" cy="226" r="4" /><circle cx="70" cy="26" r="4" />
+        </g>
+        <rect x="276" y="90" width="16" height="16" fill="#C9CDD3" transform="rotate(45 284 98)" />
+      </svg>
+    </div>
+
+    <div class="wrap contact-inner">
+      <div class="contact-copy">
+        <p class="eyebrow">상담 신청</p>
+        <p class="wordmark">WORK<span class="gold">FLOW</span><span class="dim">.AI.KR</span></p>
+        <h2 class="s-title">AI 도입, 어디서부터 시작할지 함께 정리해 드립니다</h2>
+        <p>자동화하고 싶은 업무나 조직의 교육 과제를 알려주시면, 적합한 접근을 검토해 2영업일 안에 연락드립니다.</p>
+        <ul class="card-contact">
+          <li><span class="cc-k">담당</span><span>이동호 실장 · 대표컨설턴트</span></li>
+          <li><span class="cc-k">전화</span><a href="tel:01022787636">010. 2278. 7636</a></li>
+          <li><span class="cc-k">메일</span><a href="mailto:partner@workflow.ai.kr">partner@workflow.ai.kr</a></li>
+          <li><span class="cc-k">메일</span><a href="mailto:salesacade@gmail.com">salesacade@gmail.com</a></li>
+          <li><span class="cc-k">웹</span><span>WORKFLOW.AI.KR</span></li>
+        </ul>
+      </div>
+
+      <div>
+        <form class="form-panel" id="lead-form" novalidate>
+          <div class="form-grid">
+            <div class="field">
+              <label for="f-name">이름 <span class="req">*</span></label>
+              <input id="f-name" name="name" type="text" autocomplete="name" required />
+            </div>
+            <div class="field">
+              <label for="f-company">회사 / 팀 <span class="req">*</span></label>
+              <input id="f-company" name="company" type="text" autocomplete="organization" required />
+            </div>
+            <div class="field">
+              <label for="f-email">이메일 <span class="req">*</span></label>
+              <input id="f-email" name="email" type="email" autocomplete="email" required />
+            </div>
+            <div class="field">
+              <label for="f-phone">연락처</label>
+              <input id="f-phone" name="phone" type="tel" autocomplete="tel" />
+            </div>
+            <div class="field full">
+              <label for="f-detail">자동화하고 싶은 업무 / 교육 과제 <span class="req">*</span></label>
+              <textarea id="f-detail" name="detail" required placeholder="예: 매일 들어오는 거래명세서에서 품목·금액을 뽑아 정산 시트에 입력하는 일 / 신입 온보딩 교육 운영"></textarea>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button class="btn btn-primary" type="submit">상담 신청 보내기</button>
+            <span class="form-note">제출하신 정보는 상담 목적으로만 사용됩니다.</span>
+          </div>
+        </form>
+
+        <div class="form-done" id="form-done" hidden>
+          <h3>신청이 접수되었습니다</h3>
+          <p>메일 앱이 열리면 내용을 확인하고 전송을 완료해 주세요. 2영업일 안에 담당자가 연락드리겠습니다.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span class="fb-brand"><span class="metal">SOL</span> — Workflow &amp; HRD AI</span>
+    <span class="fb-en">AI-Powered Workflow for Organizational Excellence</span>
+    <span>WORKFLOW.AI.KR &nbsp;·&nbsp; © 2026</span>
+  </div>
+</footer>
+
+<script>
+  // ── 상담 신청 폼 ──────────────────────────────────────────────
+  // 상담 신청을 받을 이메일 주소로 변경하세요.
+  var CONTACT_EMAIL = "partner@workflow.ai.kr";
+
+  (function () {
+    var form = document.getElementById("lead-form");
+    var done = document.getElementById("form-done");
+    if (!form) return;
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      if (!form.reportValidity()) return;
+      var d = new FormData(form);
+      var lines = [
+        "이름: " + (d.get("name") || "").trim(),
+        "회사/팀: " + (d.get("company") || "").trim(),
+        "이메일: " + (d.get("email") || "").trim(),
+        "연락처: " + ((d.get("phone") || "").trim() || "-"),
+        "",
+        "자동화하고 싶은 업무 / 교육 과제:",
+        (d.get("detail") || "").trim()
+      ];
+      var subject = "[상담 신청] " + (d.get("company") || "").trim();
+      var href =
+        "mailto:" + CONTACT_EMAIL +
+        "?subject=" + encodeURIComponent(subject) +
+        "&body=" + encodeURIComponent(lines.join("\n"));
+      window.location.href = href;
+      form.hidden = true;
+      done.hidden = false;
+      done.scrollIntoView({ block: "center" });
+    });
+  })();
+</script>
