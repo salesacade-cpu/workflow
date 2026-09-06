@@ -1006,9 +1006,9 @@ footer{background:#0A0A0A;color:rgba(255,255,255,.55);padding:52px 0 110px;font-
 
 <!-- ==========================================================
      09. 상담 신청
-     현재: 서버 없이 방문자의 메일 앱을 여는 방식(mailto)으로 동작합니다.
-     제출 시 partner@workflow.ai.kr 수신으로 메일 초안이 열리며, 방문자가 전송해야 접수됩니다.
-     (추후 Web3Forms 등 폼 서비스로 전환하려면 아래 access_key 와 S8 스크립트를 교체)
+     전송 방식: 스크립트 하단 S8 의 SHEET_ENDPOINT 에 Google Apps Script 웹앱 URL을 넣으면
+     제출 내용이 Google Sheet 에 저장되고 Gmail 로 알림이 발송됩니다.
+     SHEET_ENDPOINT 가 비어 있으면 메일 앱(mailto) 방식으로 동작합니다.
      ========================================================== -->
 <section id="contact" class="contact">
   <div class="wrap">
@@ -1020,9 +1020,7 @@ footer{background:#0A0A0A;color:rgba(255,255,255,.55);padding:52px 0 110px;font-
     <div class="c-grid">
       <div class="form-box">
         <form id="consultForm" novalidate>
-          <input type="hidden" name="access_key" value="YOUR-WEB3FORMS-ACCESS-KEY">
-          <input type="hidden" name="subject" value="[workflow.ai.kr] 상담 신청">
-          <input type="hidden" name="from_name" value="workflow.ai.kr">
+          <input type="hidden" name="form_source" value="workflow.ai.kr">
           <input type="checkbox" name="botcheck" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
 
           <div class="field">
@@ -1156,8 +1154,8 @@ footer{background:#0A0A0A;color:rgba(255,255,255,.55);padding:52px 0 110px;font-
       </nav>
     </div>
     <p class="biz">
-      workflow.ai.kr은 <b style="color:rgba(255,255,255,.7)">SOL(에쓰오엘)</b>이 운영하는 서브 브랜드입니다.<br>
-      상호 SOL(에쓰오엘)<span class="sep">|</span>대표 이동호<span class="sep">|</span>사업자등록번호 105-88-08232<br>
+      workflow.ai.kr은 <b style="color:rgba(255,255,255,.7)">SOL(에스오엘)</b>이 운영하는 서브 브랜드입니다.<br>
+      상호 SOL(에스오엘)<span class="sep">|</span>대표 이동호<span class="sep">|</span>사업자등록번호 105-88-08232<br>
       주소 경기도 고양시 일산동구 중앙로 1261번길 77, 메트로폴리스 704호<span class="sep">|</span>전화 02-3273-7531<span class="sep">|</span>이메일 partner@workflow.ai.kr
     </p>
     <p class="copy">© 2026 SOL. All rights reserved.</p>
@@ -1276,25 +1274,19 @@ modal.addEventListener('click', function(e){ if (e.target === modal) closeModal(
 document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeModal(); });
 
 /* ==========================================================
-   S8. 상담 신청 전송
-   실패 시 반드시 메일 안내를 노출한다 (전환 손실 방지)
+   S8. 상담 신청 전송 — Google Sheet 저장 + Gmail 알림
+   아래 SHEET_ENDPOINT 에 Google Apps Script 웹앱 URL(.../exec)을 넣으세요.
+   비어 있으면 자동으로 메일 앱(mailto) 방식으로 동작합니다.
+   전송 실패 시에도 메일 안내로 폴백합니다 (전환 손실 방지).
    ========================================================== */
 var form = $('#consultForm'), result = $('#formResult');
 var MAIL = 'partner@workflow.ai.kr';
+var SHEET_ENDPOINT = '';   /* 예: https://script.google.com/macros/s/AKfycb.../exec */
 
-function showErr(msg){
-  result.className = 'result err';
-  result.innerHTML = msg + ' <a href="mailto:' + MAIL + '">' + MAIL + '</a> 로 메일 주시면 바로 확인하겠습니다.';
-}
-
-form.addEventListener('submit', function(e){
-  e.preventDefault();
-  if (form.botcheck.checked) return;                 /* 허니팟 */
-  if (!form.checkValidity()) { form.reportValidity(); return; }
-
+function fieldLines(){
   var g = function(n){ var el = form.elements[n]; return el ? String(el.value || '').trim() : ''; };
   var picked = form.querySelector('input[name="inquiry_type"]:checked');
-  var body = [
+  return [
     '문의 유형: ' + (picked ? picked.value : ''),
     '회사명: ' + g('company'),
     '담당자명: ' + g('name'),
@@ -1308,18 +1300,60 @@ form.addEventListener('submit', function(e){
     '문의 내용:',
     g('message')
   ].join('\n');
+}
 
-  var href = 'mailto:' + MAIL +
-    '?subject=' + encodeURIComponent('[workflow.ai.kr] 상담 신청 · ' + g('company')) +
-    '&body=' + encodeURIComponent(body);
-  window.location.href = href;
+function openMail(){
+  var company = String((form.elements['company'] || {}).value || '').trim();
+  window.location.href = 'mailto:' + MAIL +
+    '?subject=' + encodeURIComponent('[workflow.ai.kr] 상담 신청 · ' + company) +
+    '&body=' + encodeURIComponent(fieldLines());
+}
 
-  form.style.display = 'none';
-  result.className = 'result ok';
-  result.innerHTML = '<b>메일 앱이 열립니다.</b><br>' +
-    '작성된 내용을 확인하신 뒤 전송해 주시면 접수됩니다. 메일 앱이 열리지 않으면 ' +
+function showMailFallback(prefix){
+  result.className = 'result err';
+  result.innerHTML = (prefix ? prefix + ' ' : '') +
+    '<a href="#" id="tryMail">메일로 보내기</a> 를 눌러주시거나 ' +
     '<a href="mailto:' + MAIL + '">' + MAIL + '</a> 로 보내주세요.';
-  track('generate_lead', { method: 'mailto' });
+  var t = document.getElementById('tryMail');
+  if (t) t.addEventListener('click', function(ev){ ev.preventDefault(); openMail(); });
+}
+
+form.addEventListener('submit', function(e){
+  e.preventDefault();
+  if (form.botcheck.checked) return;                 /* 허니팟 */
+  if (!form.checkValidity()) { form.reportValidity(); return; }
+
+  var btn = $('.submit', form);
+
+  /* 엔드포인트 미설정 시: 메일 앱 방식 */
+  if (!SHEET_ENDPOINT) {
+    openMail();
+    form.style.display = 'none';
+    result.className = 'result ok';
+    result.innerHTML = '<b>메일 앱이 열립니다.</b><br>' +
+      '작성된 내용을 확인하신 뒤 전송해 주시면 접수됩니다. 메일 앱이 열리지 않으면 ' +
+      '<a href="mailto:' + MAIL + '">' + MAIL + '</a> 로 보내주세요.';
+    track('generate_lead', { method: 'mailto' });
+    return;
+  }
+
+  btn.disabled = true; btn.textContent = '전송 중...';
+  result.className = 'result';
+
+  fetch(SHEET_ENDPOINT, { method: 'POST', body: new FormData(form) })
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      if (!data || !data.ok) throw new Error(data && data.error || 'failed');
+      form.style.display = 'none';
+      result.className = 'result ok';
+      result.innerHTML = '<b>상담 신청이 접수되었습니다.</b><br>' +
+        '영업일 기준 24시간 내에 회신드리겠습니다. 급하신 경우 02-3273-7531로 연락 주세요.';
+      track('generate_lead', { method: 'sheet' });
+    })
+    .catch(function(){
+      btn.disabled = false; btn.textContent = '상담 신청하기';
+      showMailFallback('전송에 실패했습니다.');
+    });
 });
 
 /* S9. 연락처 클릭 측정 */
